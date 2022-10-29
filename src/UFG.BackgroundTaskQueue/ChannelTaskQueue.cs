@@ -32,16 +32,6 @@ public class ChannelTaskQueue : ITaskQueue
         _queue = Channel.CreateBounded<Func<IServiceScope, CancellationToken, Task>>(options);
     }
 
-    public async ValueTask EnqueueAsync(Func<CancellationToken, Task> workItem)
-    {
-        if (workItem == null)
-        {
-            throw new ArgumentNullException(nameof(workItem));
-        }
-
-        await _queue.Writer.WriteAsync((_, ct) => workItem(ct));
-    }
-
     public async ValueTask EnqueueAsync(Func<IServiceScope, CancellationToken, Task> workItem)
     {
         if (workItem == null)

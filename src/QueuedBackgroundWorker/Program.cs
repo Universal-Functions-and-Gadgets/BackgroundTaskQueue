@@ -1,5 +1,5 @@
 using QueuedBackgroundWorker;
-using UFG.BackgroundTaskQueue.Extensions;
+using UFG.BackgroundTaskQueue.DependencyInjection;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
