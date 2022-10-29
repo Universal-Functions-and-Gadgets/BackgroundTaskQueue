@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "BackgroundTaskQueueService": {
+    "UFG.Samples.ServiceWorker": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
