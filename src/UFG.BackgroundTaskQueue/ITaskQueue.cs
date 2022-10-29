@@ -6,6 +6,17 @@ namespace UFG.BackgroundTaskQueue;
 public interface ITaskQueue
 #pragma warning restore CA1711
 {
+    /// <summary>
+    /// Enqueues a work item encapsulated within a function
+    /// </summary>
+    /// <param name="workItem">The encapsulated work</param>
+    /// <returns><see cref="ValueTask"/> for awaiting</returns>
     ValueTask EnqueueAsync(Func<IServiceScope, CancellationToken, Task> workItem);
+
+    /// <summary>
+    /// Dequeues a work item for execution
+    /// </summary>
+    /// <param name="cancellationToken"><see cref="CancellationToken"/> to stop dequeue operation</param>
+    /// <returns>The next work item available</returns>
     ValueTask<Func<IServiceScope, CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken);
 }
