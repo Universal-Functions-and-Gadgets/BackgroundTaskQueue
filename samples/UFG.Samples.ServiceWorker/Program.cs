@@ -1,4 +1,4 @@
-using QueuedBackgroundWorker;
+using UFG.Samples.ServiceWorker;
 using UFG.BackgroundTaskQueue.DependencyInjection;
 
 IHost host = Host.CreateDefaultBuilder(args)

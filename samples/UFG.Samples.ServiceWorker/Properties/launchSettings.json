@@ -1,6 +1,6 @@
 ﻿{
   "profiles": {
-    "QueuedBackgroundWorker": {
+    "BackgroundTaskQueueService": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {

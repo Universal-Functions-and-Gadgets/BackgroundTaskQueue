@@ -1,7 +1,7 @@
 using UFG.BackgroundTaskQueue;
 using UFG.BackgroundTaskQueue.Extensions;
 
-namespace QueuedBackgroundWorker;
+namespace UFG.Samples.ServiceWorker;
 
 public class Worker : BackgroundService
 {
