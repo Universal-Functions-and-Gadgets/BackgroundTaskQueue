@@ -1,0 +1,15 @@
+﻿<Project>
+    <PropertyGroup>
+        <AnalysisMode>Recommended</AnalysisMode>
+        <Copyright>Copyright 2022 (c) UFG. All rights reserved.</Copyright>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net6.0</TargetFramework>
+        <NoWarn>NU1603,NU1701</NoWarn>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+        <AnalysisMode>Recommended</AnalysisMode>
+    </PropertyGroup>
+</Project>
