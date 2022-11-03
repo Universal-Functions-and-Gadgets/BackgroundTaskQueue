@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace UFG.BackgroundTaskQueue;
 
-internal class QueueWorker : BackgroundService
+public class QueueWorker : BackgroundService
 {
     private readonly ITaskQueue _taskQueue;
     private readonly IServiceProvider _serviceProvider;
