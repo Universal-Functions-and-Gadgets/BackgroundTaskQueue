@@ -4,6 +4,9 @@ namespace UFG.BackgroundTaskQueue;
 
 using System.Threading.Channels;
 
+/// <summary>
+/// Bounded <see cref="Channel{T}"/> based implementation of <see cref="ITaskQueue"/>
+/// </summary>
 #pragma warning disable CA1711
 public class ChannelTaskQueue : ITaskQueue
 #pragma warning restore CA1711
@@ -16,15 +19,14 @@ public class ChannelTaskQueue : ITaskQueue
     {
     }
 
-    public ChannelTaskQueue(int capacity)
-    {
-        var options = new BoundedChannelOptions(capacity)
+    public ChannelTaskQueue(int capacity) 
+        : this(new BoundedChannelOptions(capacity)
         {
             FullMode = BoundedChannelFullMode.Wait,
             SingleWriter = false,
             SingleReader = true
-        };
-        _queue = Channel.CreateBounded<Func<IServiceScope, CancellationToken, Task>>(options);
+        })
+    {
     }
 
     public ChannelTaskQueue(BoundedChannelOptions options)
