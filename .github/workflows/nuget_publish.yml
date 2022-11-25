@@ -1,4 +1,4 @@
-name: Publish Nuget Packget
+name: Publish Nuget Package
 
 on:
   release:
@@ -34,7 +34,6 @@ jobs:
     - name: Create the app package
       run: dotnet pack ./${{ env.Solution_Name }} -c Release
 
-    # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload Nuget Package
       env:
         API_KEY: ${{ secrets.NUGET_API_KEY }}
