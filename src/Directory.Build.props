@@ -16,8 +16,6 @@
         <PackageTags>background queue</PackageTags>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <PackageProjectUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue/blob/main/LICENSE</PackageLicenseUrl>
-        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <PackageId>UFG.BackgroundTaskQueue</PackageId>
     </PropertyGroup>
 </Project>
