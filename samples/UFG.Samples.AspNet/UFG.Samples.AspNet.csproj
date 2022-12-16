@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-        <PackageReference Include="UFG.BackgroundTaskQueue" Version="1.0.1" />
+        <PackageReference Include="UFG.BackgroundTaskQueue" Version="1.0.0" />
     </ItemGroup>
 
 </Project>
