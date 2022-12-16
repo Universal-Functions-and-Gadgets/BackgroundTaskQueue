@@ -1,5 +1,6 @@
 ﻿using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace UFG.BackgroundTaskQueue.DependencyInjection;
 
@@ -10,9 +11,12 @@ public static class ServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceCollection"/></param>
     /// <returns>The <see cref="IServiceCollection"/> for chaining calls</returns>
-    public static IServiceCollection AddTaskQueue(this IServiceCollection services) =>
-        services.AddHostedService<QueueWorker>()
-            .AddSingleton<ITaskQueue, ChannelTaskQueue>();
+    public static IServiceCollection AddTaskQueue(this IServiceCollection services)
+    {
+        services.TryAddSingleton<ITaskQueue, ChannelTaskQueue>();
+        
+        return services.AddHostedService<QueueWorker>();
+    }
 
     /// <summary>
     /// Adds <see cref="QueueWorker"/> as a hosted service and <see cref="ITaskQueue"/> to the service collection with
