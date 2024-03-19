@@ -1,6 +1,7 @@
 ﻿using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace UFG.BackgroundTaskQueue.DependencyInjection;
 
@@ -27,7 +28,8 @@ public static class ServiceCollectionExtensions
     /// <returns>The <see cref="IServiceCollection"/> for chaining calls</returns>
     public static IServiceCollection AddTaskQueue(this IServiceCollection services, int capacity) =>
         services.AddHostedService<QueueWorker>()
-            .AddSingleton<ITaskQueue>(new ChannelTaskQueue(capacity));
+            .AddSingleton<ITaskQueue>(sp =>
+                new ChannelTaskQueue(capacity, sp.GetRequiredService<ILogger<ChannelTaskQueue>>()));
 
     /// <summary>
     /// Adds <see cref="QueueWorker"/> as a hosted service and <see cref="ITaskQueue"/> to the service collection with
@@ -38,5 +40,6 @@ public static class ServiceCollectionExtensions
     /// <returns>The <see cref="IServiceCollection"/> for chaining calls</returns>
     public static IServiceCollection AddTaskQueue(this IServiceCollection services, BoundedChannelOptions options) =>
         services.AddHostedService<QueueWorker>()
-            .AddSingleton<ITaskQueue>(new ChannelTaskQueue(options));
+            .AddSingleton<ITaskQueue>(sp =>
+                new ChannelTaskQueue(options, sp.GetRequiredService<ILogger<ChannelTaskQueue>>()));
 }
