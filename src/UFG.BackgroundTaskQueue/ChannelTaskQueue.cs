@@ -46,11 +46,19 @@ public class ChannelTaskQueue : ITaskQueue
     }
 
     /// <inheritdoc />
-    public async ValueTask EnqueueAsync(Func<IServiceScope, CancellationToken, Task> workItem) =>
-        await _queue.Writer.WriteAsync(workItem);
+    public ValueTask EnqueueAsync(Func<IServiceScope, CancellationToken, Task> workItem) =>
+        _queue.Writer.WriteAsync(workItem);
 
     /// <inheritdoc />
-    public async ValueTask<Func<IServiceScope, CancellationToken, Task>> DequeueAsync(
+    public ValueTask<Func<IServiceScope, CancellationToken, Task>> DequeueAsync(
         CancellationToken cancellationToken) =>
-        await _queue.Reader.ReadAsync(cancellationToken);
+        _queue.Reader.ReadAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public IAsyncEnumerable<Func<IServiceScope, CancellationToken, Task>> DequeueStreamAsync(
+        CancellationToken cancellationToken) =>
+        _queue.Reader.ReadAllAsync(cancellationToken);
+
+    /// <inheritdoc />
+    public int Count => _queue.Reader.Count;
 }

@@ -4,7 +4,7 @@
         <Copyright>Copyright 2022 (c) UFG. All rights reserved.</Copyright>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
         <NoWarn>NU1603,NU1701</NoWarn>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -13,6 +13,9 @@
     
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-        <PackageReference Include="UFG.BackgroundTaskQueue" Version="1.0.1" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\UFG.BackgroundTaskQueue\UFG.BackgroundTaskQueue.csproj" />
     </ItemGroup>
 </Project>
