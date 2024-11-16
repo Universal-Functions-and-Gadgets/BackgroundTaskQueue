@@ -18,6 +18,6 @@
         <PackageProjectUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue</PackageProjectUrl>
         <PackageId>UFG.BackgroundTaskQueue</PackageId>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <PackageLicenseUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue/blob/main/LICENSE</PackageLicenseUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 </Project>
