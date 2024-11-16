@@ -4,7 +4,7 @@
         <Copyright>Copyright 2022 (c) UFG. All rights reserved.</Copyright>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
         <NoWarn>NU1603,NU1701</NoWarn>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>

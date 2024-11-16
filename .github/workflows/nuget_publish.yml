@@ -5,7 +5,7 @@ on:
     types: [published]
     
 jobs:
-  publish_to_nuget:
+  pack:
     runs-on: ubuntu-latest
     env:
       Solution_Name: BackgroundTaskQueue.sln
@@ -30,7 +30,30 @@ jobs:
     - name: Create the app package
       run: dotnet pack ./${{ env.Solution_Name }} -c Release
 
+    - uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages-${{ github.ref_name }}
+        path: src/UFG.BackgroundTaskQueue/bin/Release/**/*.nupkg
+        retention-days: 1
+
+  publish_to_nuget:
+    needs:
+      - pack
+    runs-on: ubuntu-latest
+    env:
+      Solution_Name: BackgroundTaskQueue.sln
+
+    strategy:
+      fail-fast: false
+      matrix:
+        dotnet-version: [ 'net6.0', 'net8.0', 'net9.0' ]
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages-${{ github.ref_name }}
+
     - name: Upload Nuget Package
       env:
         API_KEY: ${{ secrets.NUGET_API_KEY }}
-      run: dotnet nuget push ./src/UFG.BackgroundTaskQueue/bin/Release/UFG.BackgroundTaskQueue.${{  github.ref_name }}.nupkg --api-key ${{ env.API_KEY }} --source https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/UFG.BackgroundTaskQueue/bin/Release/${{ matrix.dotnet-version }}/UFG.BackgroundTaskQueue.${{  github.ref_name }}.nupkg --api-key ${{ env.API_KEY }} --source https://api.nuget.org/v3/index.json
