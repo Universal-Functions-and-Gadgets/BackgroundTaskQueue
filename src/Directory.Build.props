@@ -11,12 +11,13 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
         <AnalysisMode>Recommended</AnalysisMode>
-        <Version>1.1.0-beta.1</Version>
-        <PackageVersion>1.1.0-beta.1</PackageVersion>
+        <Version>1.1.0-beta.2</Version>
+        <PackageVersion>1.1.0-beta.2</PackageVersion>
         <PackageTags>background queue</PackageTags>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <PackageProjectUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue</PackageProjectUrl>
         <PackageId>UFG.BackgroundTaskQueue</PackageId>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageLicenseUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue/blob/main/LICENSE</PackageLicenseUrl>
     </PropertyGroup>
 </Project>
