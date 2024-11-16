@@ -4,8 +4,8 @@
         <Copyright>Copyright 2022 (c) UFG. All rights reserved.</Copyright>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
-        <NoWarn>NU1603,NU1701</NoWarn>
+        <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
+        <NoWarn>CS1591,NU1603,NU1701</NoWarn>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -17,5 +17,6 @@
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <PackageProjectUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue</PackageProjectUrl>
         <PackageId>UFG.BackgroundTaskQueue</PackageId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 </Project>
