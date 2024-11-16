@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using UFG.BackgroundTaskQueue;
 using UFG.BackgroundTaskQueue.Extensions;
 
 namespace UFG.Samples.ServiceWorker;
 
+#pragma warning disable CA1848
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
@@ -16,21 +18,20 @@ public class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var count = 0;
         while (!stoppingToken.IsCancellationRequested)
         {
             var now = DateTime.UtcNow;
 
-            await _taskQueue.EnqueueAsync(() =>
+            await _taskQueue.EnqueueAsync(async () =>
             {
-                var then = now;
-                var newNow = DateTime.UtcNow;
+                var sw = Stopwatch.StartNew();
+                await Task.Delay(TimeSpan.FromSeconds(2));
 
-#pragma warning disable CA1848
-                _logger.LogInformation("Duration to complete {Duration}", newNow.Subtract(then));
-#pragma warning restore CA1848
-                return Task.CompletedTask;
+                _logger.LogInformation("Duration to complete {Duration}", sw.Elapsed);
             });
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(100, stoppingToken);
+            _logger.LogInformation("Added {Count} items", ++count);
         }
     }
 }

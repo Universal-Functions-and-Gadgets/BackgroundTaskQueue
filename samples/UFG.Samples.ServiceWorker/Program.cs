@@ -4,7 +4,7 @@ using UFG.Samples.ServiceWorker;
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
-        services.AddTaskQueue()
+        services.AddParallelTaskQueue()
             .AddHostedService<Worker>();
     })
     .Build();

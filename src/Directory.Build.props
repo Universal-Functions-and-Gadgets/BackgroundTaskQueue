@@ -4,18 +4,19 @@
         <Copyright>Copyright 2022 (c) UFG. All rights reserved.</Copyright>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <NoWarn>NU1603,NU1701</NoWarn>
+        <TargetFrameworks>net6.0;net8.0;net9.0</TargetFrameworks>
+        <NoWarn>CS1591,NU1603,NU1701</NoWarn>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
         <AnalysisMode>Recommended</AnalysisMode>
-        <Version>1.0.1</Version>
-        <PackageVersion>1.0.1</PackageVersion>
+        <Version>1.1.0-beta.1</Version>
+        <PackageVersion>1.1.0-beta.1</PackageVersion>
         <PackageTags>background queue</PackageTags>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <PackageProjectUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue</PackageProjectUrl>
         <PackageId>UFG.BackgroundTaskQueue</PackageId>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 </Project>
