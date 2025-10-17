@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,11 +13,10 @@ internal sealed class ParallelQueueWorker(
 {
     private static readonly TimeSpan s_cycleDelay = TimeSpan.FromMilliseconds(50);
 
-#if NET8_0_OR_GREATER
-    private ImmutableList<(Guid Id, IServiceScope Scope, Task Task)> _tasks = [];
-#else
-    private ImmutableList<(Guid Id, IServiceScope Scope, Task Task)> _tasks = ImmutableList<(Guid Id, IServiceScope Scope, Task Task)>.Empty;
-#endif
+    private (IServiceScope? Scope, Task? Task)?[] _tasks = [];
+    private ConcurrentQueue<int> _availableIndices = new();
+    private readonly object _tasksLock = new();
+    private int _activeTaskCount;
     private bool _isRunning = true;
     private Func<bool> _hasItems = () => false;
     private Task _process = Task.CompletedTask;
@@ -31,9 +30,20 @@ internal sealed class ParallelQueueWorker(
 
         logger.LogInformation($"Starting {nameof(ParallelQueueWorker)}");
 
+        // Initialize the fixed-size array and available indices queue
+        _tasks = new (IServiceScope? Scope, Task? Task)?[settings.ConcurrentLimit];
+        _availableIndices = new ConcurrentQueue<int>(Enumerable.Range(0, settings.ConcurrentLimit));
+        _activeTaskCount = 0;
+
         _hasItems = settings.StopBehavior == ParallelWorkerStopBehavior.Drain
             ? () => taskQueue.Count > 0
-            : () => !_tasks.IsEmpty;
+            : () =>
+            {
+                lock (_tasksLock)
+                {
+                    return _activeTaskCount > 0;
+                }
+            };
 
         _process = ProcessQueueAsync();
         _cleanUp = CleanUpAsync();
@@ -47,13 +57,9 @@ internal sealed class ParallelQueueWorker(
         {
             await foreach (var workItem in taskQueue.DequeueStreamAsync(_readCts.Token))
             {
-                var scope = serviceProvider.CreateScope();
-
-                _tasks = _tasks.Add((Guid.NewGuid(), scope, workItem(scope, _stopCts.Token)));
-
-                logger.LogDebug("Task count {Count} / {ConcurrentLimit}", _tasks.Count, settings.ConcurrentLimit);
-
-                while (_tasks.Count >= settings.ConcurrentLimit)
+                // Wait for an available index
+                int index;
+                while (!_availableIndices.TryDequeue(out index))
                 {
                     if (DateTime.UtcNow > nextLog)
                     {
@@ -62,6 +68,17 @@ internal sealed class ParallelQueueWorker(
                     }
                     await Task.Delay(s_cycleDelay, _readCts.Token);
                 }
+
+                var scope = serviceProvider.CreateScope();
+                var task = workItem(scope, _stopCts.Token);
+
+                lock (_tasksLock)
+                {
+                    _tasks[index] = (scope, task);
+                    _activeTaskCount++;
+                }
+
+                logger.LogDebug("Task count {Count} / {ConcurrentLimit}", _activeTaskCount, settings.ConcurrentLimit);
             }
         }
         catch (OperationCanceledException)
@@ -75,20 +92,35 @@ internal sealed class ParallelQueueWorker(
     {
         while (_isRunning || _hasItems())
         {
-            var completed = _tasks.Where(x => x.Task.IsCompleted).ToImmutableList();
-
-            completed
-                .ForEach(x =>
+            for (var i = 0; i < _tasks.Length; i++)
+            {
+                (IServiceScope? Scope, Task? Task)? taskEntry;
+                lock (_tasksLock)
                 {
-                    if (x.Task.IsFaulted)
-                    {
-                        logger.LogError(new EventId(101), x.Task.Exception, "Queued task faulted");
-                    }
-                    x.Scope.Dispose();
-                });
+                    taskEntry = _tasks[i];
+                }
 
-            var completedIds = completed.Select(x => x.Id).ToImmutableHashSet();
-            _tasks = _tasks.Where(x => !completedIds.Contains(x.Id)).ToImmutableList();
+                if (taskEntry.HasValue && taskEntry.Value.Task != null && taskEntry.Value.Task.IsCompleted)
+                {
+                    var task = taskEntry.Value.Task;
+                    var scope = taskEntry.Value.Scope;
+
+                    if (task.IsFaulted)
+                    {
+                        logger.LogError(new EventId(101), task.Exception, "Queued task faulted");
+                    }
+
+                    scope?.Dispose();
+
+                    lock (_tasksLock)
+                    {
+                        _tasks[i] = null;
+                        _activeTaskCount--;
+                    }
+
+                    _availableIndices.Enqueue(i);
+                }
+            }
 
             await Task.Delay(TimeSpan.FromMilliseconds(25), _stopCts.Token);
         }
