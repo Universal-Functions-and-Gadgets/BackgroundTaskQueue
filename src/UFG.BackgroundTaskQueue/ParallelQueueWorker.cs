@@ -18,6 +18,7 @@ internal sealed class ParallelQueueWorker(
 #else
     private ImmutableList<(Guid Id, IServiceScope Scope, Task Task)> _tasks = ImmutableList<(Guid Id, IServiceScope Scope, Task Task)>.Empty;
 #endif
+    private readonly object _tasksLock = new();
     private bool _isRunning = true;
     private Func<bool> _hasItems = () => false;
     private Task _process = Task.CompletedTask;
@@ -33,7 +34,13 @@ internal sealed class ParallelQueueWorker(
 
         _hasItems = settings.StopBehavior == ParallelWorkerStopBehavior.Drain
             ? () => taskQueue.Count > 0
-            : () => !_tasks.IsEmpty;
+            : () =>
+            {
+                lock (_tasksLock)
+                {
+                    return !_tasks.IsEmpty;
+                }
+            };
 
         _process = ProcessQueueAsync();
         _cleanUp = CleanUpAsync();
@@ -49,12 +56,28 @@ internal sealed class ParallelQueueWorker(
             {
                 var scope = serviceProvider.CreateScope();
 
-                _tasks = _tasks.Add((Guid.NewGuid(), scope, workItem(scope, _stopCts.Token)));
-
-                logger.LogDebug("Task count {Count} / {ConcurrentLimit}", _tasks.Count, settings.ConcurrentLimit);
-
-                while (_tasks.Count >= settings.ConcurrentLimit)
+                int currentCount;
+                lock (_tasksLock)
                 {
+                    _tasks = _tasks.Add((Guid.NewGuid(), scope, workItem(scope, _stopCts.Token)));
+                    currentCount = _tasks.Count;
+                }
+
+                logger.LogDebug("Task count {Count} / {ConcurrentLimit}", currentCount, settings.ConcurrentLimit);
+
+                while (true)
+                {
+                    int count;
+                    lock (_tasksLock)
+                    {
+                        count = _tasks.Count;
+                    }
+
+                    if (count < settings.ConcurrentLimit)
+                    {
+                        break;
+                    }
+
                     if (DateTime.UtcNow > nextLog)
                     {
                         logger.LogDebug("Task count reached limit of {Limit}", settings.ConcurrentLimit);
@@ -75,7 +98,13 @@ internal sealed class ParallelQueueWorker(
     {
         while (_isRunning || _hasItems())
         {
-            var completed = _tasks.Where(x => x.Task.IsCompleted).ToImmutableList();
+            ImmutableList<(Guid Id, IServiceScope Scope, Task Task)> currentTasks;
+            lock (_tasksLock)
+            {
+                currentTasks = _tasks;
+            }
+
+            var completed = currentTasks.Where(x => x.Task.IsCompleted).ToImmutableList();
 
             completed
                 .ForEach(x =>
@@ -88,7 +117,13 @@ internal sealed class ParallelQueueWorker(
                 });
 
             var completedIds = completed.Select(x => x.Id).ToImmutableHashSet();
-            _tasks = _tasks.Where(x => !completedIds.Contains(x.Id)).ToImmutableList();
+            if (!completedIds.IsEmpty)
+            {
+                lock (_tasksLock)
+                {
+                    _tasks = _tasks.Where(x => !completedIds.Contains(x.Id)).ToImmutableList();
+                }
+            }
 
             await Task.Delay(TimeSpan.FromMilliseconds(25), _stopCts.Token);
         }
