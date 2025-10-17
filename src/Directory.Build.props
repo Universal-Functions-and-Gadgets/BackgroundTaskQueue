@@ -11,8 +11,8 @@
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
         <AnalysisMode>Recommended</AnalysisMode>
-        <Version>1.1.0-beta.2</Version>
-        <PackageVersion>1.1.0-beta.2</PackageVersion>
+        <Version>1.2.0-beta.2</Version>
+        <PackageVersion>1.2.0-beta.2</PackageVersion>
         <PackageTags>background queue</PackageTags>
         <PublishRepositoryUrl>True</PublishRepositoryUrl>
         <PackageProjectUrl>https://github.com/Universal-Functions-and-Gadgets/BackgroundTaskQueue</PackageProjectUrl>
