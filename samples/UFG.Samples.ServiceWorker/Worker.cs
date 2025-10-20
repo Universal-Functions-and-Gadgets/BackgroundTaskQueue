@@ -25,10 +25,11 @@ public class Worker : BackgroundService
 
             await _taskQueue.EnqueueAsync(async () =>
             {
+                var idx = count;
                 var sw = Stopwatch.StartNew();
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.Delay(TimeSpan.FromSeconds(15));
 
-                _logger.LogInformation("Duration to complete {Duration}", sw.Elapsed);
+                _logger.LogInformation("[{Index}] Duration to complete {Duration}", idx, sw.Elapsed);
             });
             await Task.Delay(100, stoppingToken);
             _logger.LogInformation("Added {Count} items", ++count);

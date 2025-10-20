@@ -36,17 +36,30 @@ internal sealed class ParallelQueueWorker(
         _activeTaskCount = 0;
 
         _hasItems = settings.StopBehavior == ParallelWorkerStopBehavior.Drain
-            ? () => taskQueue.Count > 0
-            : () =>
-            {
-                lock (_tasksLock)
-                {
-                    return _activeTaskCount > 0;
-                }
-            };
+            ? HasItemsActivePlusWaiting
+            : HasItemsActiveOnly;
 
         _process = ProcessQueueAsync();
         _cleanUp = CleanUpAsync();
+    }
+
+    private bool HasItemsActivePlusWaiting()
+    {
+        int atc;
+        lock (_tasksLock)
+        {
+            atc = _activeTaskCount;
+        }
+
+        return taskQueue.Count > 0 || atc > 0;
+    }
+
+    private bool HasItemsActiveOnly()
+    {
+        lock (_tasksLock)
+        {
+            return _activeTaskCount > 0;
+        }
     }
 
     private async Task ProcessQueueAsync()
@@ -66,6 +79,7 @@ internal sealed class ParallelQueueWorker(
                         logger.LogDebug("Task count reached limit of {Limit}", settings.ConcurrentLimit);
                         nextLog = DateTime.UtcNow.AddSeconds(10);
                     }
+
                     await Task.Delay(s_cycleDelay, _readCts.Token);
                 }
 
