@@ -29,10 +29,17 @@ public class Worker : BackgroundService
                 var sw = Stopwatch.StartNew();
                 await Task.Delay(TimeSpan.FromSeconds(15));
 
-                _logger.LogInformation("[{Index}] Duration to complete {Duration}", idx, sw.Elapsed);
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("[{Index}] Duration to complete {Duration}", idx, sw.Elapsed);
+                }
             });
             await Task.Delay(100, stoppingToken);
-            _logger.LogInformation("Added {Count} items", ++count);
+            
+            if (_logger.IsEnabled(LogLevel.Information))
+            {
+                _logger.LogInformation("Added {Count} items", ++count);
+            }
         }
     }
 }

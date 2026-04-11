@@ -76,7 +76,10 @@ internal sealed class ParallelQueueWorker(
                 {
                     if (DateTime.UtcNow > nextLog)
                     {
-                        logger.LogDebug("Task count reached limit of {Limit}", settings.ConcurrentLimit);
+                        if (logger.IsEnabled(LogLevel.Debug))
+                        {
+                            logger.LogDebug("Task count reached limit of {Limit}", settings.ConcurrentLimit);
+                        }
                         nextLog = DateTime.UtcNow.AddSeconds(10);
                     }
 
@@ -92,7 +95,12 @@ internal sealed class ParallelQueueWorker(
                     _activeTaskCount++;
                 }
 
-                logger.LogDebug("Task count {Count} / {ConcurrentLimit}", _activeTaskCount, settings.ConcurrentLimit);
+                if (logger.IsEnabled(LogLevel.Debug))
+                {
+                    logger.LogDebug("Task count {Count} / {ConcurrentLimit}",
+                        _activeTaskCount,
+                        settings.ConcurrentLimit);
+                }
             }
         }
         catch (OperationCanceledException)
